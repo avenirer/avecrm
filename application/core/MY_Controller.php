@@ -66,7 +66,8 @@ class Auth_Controller extends MY_Controller {
     public $current_user;
     function __construct() {
         parent::__construct();
-        $this->load->library('ion_auth');
+        $this->load->library(array('ion_auth','form_validation'));
+      $this->load->helper('form');
         $this->load->library('postal');
         if($this->ion_auth->logged_in()===FALSE)
         {
