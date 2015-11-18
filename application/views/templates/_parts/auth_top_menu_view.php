@@ -8,12 +8,26 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <?php echo anchor('/', $website->title, 'class="navbar-brand"');?>
+            <?php echo anchor('dashboard', $website->title, 'class="navbar-brand"');?>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><?php echo anchor('dashboard','Home');?></li>
-                <li><a href="#contact">Contact</a></li>
+              <li><?php echo anchor('dashboard','Home');?></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                      aria-haspopup="true" aria-expanded="false">Customers <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><?php echo anchor('dashboard/customers/create', 'Add customer');?></li>
+                  <?php
+                  if($this->ion_auth->is_admin()) {
+                    echo '<li role="separator" class="divider"></li>';
+                    echo '<li>'.anchor('dashboard/customer-types','Customer types').'</li>';
+                    echo '<li>'.anchor('dashboard/customer-types/create','Add customer type').'</li>';
+                  }
+                  ?>
+                </ul>
+              </li>
+              <li><?php echo anchor('dashboard/cities','Cities');?></li>
                 <li><?php echo anchor('dashboard/about','About');?></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">

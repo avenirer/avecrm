@@ -1,13 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Clients extends Auth_Controller
+class Customers extends Auth_Controller
 {
 
   function __construct()
   {
     parent::__construct();
-    $this->load->model('client_model');
+    $this->load->model('customer_model');
       /*
       if(!$this->ion_auth->in_group('admin'))
       {
@@ -16,38 +16,39 @@ class Clients extends Auth_Controller
       }*/
   }
 
-  /*public function index($group_id = NULL)
+  public function index()
   {
-    $this->data['page_title'] = 'Users';
+    $this->data['page_title'] = 'Customers';
     //$this->data['users'] = $this->ion_auth->users($group_id)->result();
-    $this->data['users'] = $this->ion_auth->users(array(1,'members'))->result();
-    $this->render('dashboard/users/index_view');
+    $this->data['customers'] = $this->customer_model->get_all();
+    $this->render('dashboard/customers/index_view');
   }
-  */
   public function create()
   {
-      $this->data['page_title'] = 'Create client';
+      $this->data['page_title'] = 'Create customer';
 
-    if($this->client_model->from_form()->insert()===FALSE)
+    $id = $this->customer_model->from_form()->insert();
+    if($id===FALSE)
       {
-          $this->render('dashboard/users/create_view');
+        $this->load->model('customer_type_model');
+        $this->data['customer_types'] = $this->customer_type_model->order_by('title','ASC')->as_dropdown('title')
+            ->get_all();
+        $this->data['sex'] = array('-' => '-','M' => 'M','F'=>'F');
+        $this->load->model('city_model');
+        $this->data['cities'] = $this->city_model->as_dropdown('name')->order_by('name','ASC')->get_all();
+        if($this->data['cities']===FALSE)
+        {
+          $this->data['cities'] = array();
+        }
+        array_unshift($this->data['cities'],'Nementionat');
+        //print_r($customer_types);
+        $this->render('dashboard/customers/create_view');
       }
       else
       {
-          $username = $this->input->post('username');
-          $email = $this->input->post('email');
-          $password = $this->input->post('password');
-          $group_ids = $this->input->post('groups');
-
-          $additional_data = array(
-              'first_name' => $this->input->post('first_name'),
-              'last_name'  => $this->input->post('last_name'),
-              'company'    => $this->input->post('company'),
-              'phone'      => $this->input->post('phone')
-          );
-          $this->ion_auth->register($username, $password, $email, $additional_data, $group_ids);
-          $this->postal->add($this->ion_auth->messages(),'success');
-          redirect('dashboard/users');
+        $this->rat->log('Added customer with id '.$id,1,$_SESSION['user_id']);
+        $this->postal->add('Customer added successfully','success');
+        redirect('dashboard/customers');
       }
   }
   /*
