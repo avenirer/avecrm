@@ -53,21 +53,21 @@ class Cities extends Auth_Controller
     }
   }
 
-  public function delete($type_id = NULL)
+  public function delete($id = NULL)
   {
-    if(is_null($type_id))
+    if(is_null($id))
     {
-      $this->postal->add('There\'s no user to delete','error');
+      $this->postal->add('There\'s no city to delete','error');
     }
-    elseif($this->customer_type_model->delete($type_id))
+    elseif($this->city_model->delete($id))
     {
-      $this->rat->log('Deleted customer type with id '.$type_id,0,$_SESSION['user_id']);
-      $this->postal->add('Customer type deleted successfully','success');
+      $this->rat->log('Deleted city with id '.$id,0,$_SESSION['user_id']);
+      $this->postal->add('City deleted successfully','success');
     }
     else
     {
-      $this->postal->add('Could not delete the customer type','error');
+      $this->postal->add('Could not delete the city','error');
     }
-    redirect('dashboard/customer_types');
+    redirect('dashboard/cities');
   }
 }

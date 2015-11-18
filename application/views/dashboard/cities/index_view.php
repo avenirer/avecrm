@@ -2,8 +2,7 @@
 <div class="row">
   <div class="col-lg-12">
     <a href="<?php echo site_url('dashboard/cities/create');?>" class="btn btn-primary">Add city</a>
-    <a href="<?php echo site_url('dashboard/cities');?>" class="btn btn-primary">See all cities
-              types</a>
+    <a href="<?php echo site_url('dashboard/cities');?>" class="btn btn-primary">See all cities</a>
   </div>
 </div>
 <div class="row">

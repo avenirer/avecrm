@@ -17,6 +17,7 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                       aria-haspopup="true" aria-expanded="false">Customers <span class="caret"></span></a>
                 <ul class="dropdown-menu">
+                  <li><?php echo anchor('dashboard/customers', 'List customers');?></li>
                   <li><?php echo anchor('dashboard/customers/create', 'Add customer');?></li>
                   <?php
                   if($this->ion_auth->is_admin()) {
