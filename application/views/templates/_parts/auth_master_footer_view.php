@@ -13,6 +13,14 @@
   $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 
+    $('.datepicker').datetimepicker({
+      locale: 'en',
+      format: 'YYYY-MM-DD',
+      useCurrent: false,
+      sideBySide: true,
+      showTodayButton: true
+    });
+
     $('.datetimepicker').datetimepicker({
       locale: 'en',
       format: 'YYYY-MM-DD HH:mm:ss',

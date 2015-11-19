@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-lg-4 col-lg-offset-4">
-    <h1>Create customer type</h1>
+    <h1>Add contact type</h1>
     <?php echo form_open();?>
         <div class="form-group">
             <?php
@@ -18,8 +18,8 @@
             echo form_textarea('info',set_value('info'),'class="form-control"');
             ?>
         </div>
-        <?php echo form_submit('submit', 'Create customer type', 'class="btn btn-primary btn-lg btn-block"');?>
-        <?php echo anchor('dashboard', 'Cancel','class="btn btn-default btn-lg btn-block"');?>
+        <?php echo form_submit('submit', 'Create contact type', 'class="btn btn-primary btn-lg btn-block"');?>
+        <?php echo anchor('dashboard/contact-types', 'Cancel','class="btn btn-default btn-lg btn-block"');?>
         <?php echo form_close();?>
     </div>
 </div>

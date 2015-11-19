@@ -9,7 +9,8 @@ class City_model extends MY_Model
   public $timestamps = TRUE;
   public $soft_deletes = TRUE;
   public $has_many = array(
-      'customers' => array('foreign_model'=>'customer_model','foreign_table'=>'customers','foreign_key'=>'customer_type','local_key'=>'id')
+      'contacts' => array('foreign_model'=>'contact_model','foreign_table'=>'contacts','foreign_key'=>'city',
+          'local_key'=>'id')
   );
 
   public function __construct(){
