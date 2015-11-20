@@ -163,6 +163,37 @@ if(isset($contact))
       echo form_input('title',set_value('title'),'class="form-control" placeholder="Title"');
       ?>
     </div>
+    <?php
+    echo form_error('source');
+    if($sources)
+    {
+      echo form_dropdown('source',$sources,set_value('source'),'class="form-control"');
+    }
+    else
+    {
+      echo '<br />';
+    }
+    if($this->ion_auth->is_admin()) {
+      echo anchor('dashboard/opportunity-sources/create', '<i class="fa fa-plus-circle" data-toggle="tooltip"
+            data-placement="right" title="Add a source"></i>');
+    }
+    ?>
+
+    <?php
+    echo form_error('status');
+    if($status)
+    {
+      echo form_dropdown('status',$status,set_value('status'),'class="form-control"');
+    }
+    else
+    {
+      echo '<br />';
+    }
+    if($this->ion_auth->is_admin()) {
+      echo anchor('dashboard/opportunity-status/create', '<i class="fa fa-plus-circle" data-toggle="tooltip"
+            data-placement="right" title="Add a status"></i>');
+    }
+    ?>
     <div class="form-group">
       <?php
       echo form_error('description');

@@ -16,6 +16,21 @@
         <li><?php echo anchor('dashboard','Home');?></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+             aria-haspopup="true" aria-expanded="false">Opportunities <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><?php echo anchor('dashboard/opportunities', 'List opportunities');?></li>
+            <li><?php echo anchor('dashboard/opportunities/create', 'Add opportunity');?></li>
+            <?php
+            if($this->ion_auth->is_admin()) {
+              echo '<li role="separator" class="divider"></li>';
+              echo '<li>'.anchor('dashboard/opportunity-sources','List sources').'</li>';
+              echo '<li>'.anchor('dashboard/opportunity-sources/create','Add source').'</li>';
+            }
+            ?>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Contacts <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><?php echo anchor('dashboard/contacts', 'List contacts');?></li>

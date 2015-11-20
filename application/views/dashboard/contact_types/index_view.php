@@ -17,7 +17,7 @@
       foreach($contact_types as $type)
       {
         echo '<tr>';
-        echo '<td>'.$type->id.'</td><td>'.$type->title.'</td><td>'.$type->info.'</td></td>';
+        echo '<td>'.$type->id.'</td><td>'.$type->title.'</td><td>'.$type->info.'</td>';
         echo '<td>';
         echo anchor('dashboard/contact-types/edit/'.$type->id,'<span class="fa fa-pencil"></span>').' '.anchor('dashboard/contact-types/delete/'.$type->id,'<span class="fa fa-eraser"></span>');
         echo '</td>';

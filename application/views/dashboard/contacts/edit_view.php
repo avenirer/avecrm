@@ -12,7 +12,7 @@
           echo form_error('contact_type');
           if($contact_types)
           {
-            echo form_dropdown('contact_type',$contact_types,set_select('contact_type',$contact->contact_type),
+            echo form_dropdown('contact_type',$contact_types,set_value('contact_type',$contact->contact_type),
                 'class="form-control"');
           }
           else

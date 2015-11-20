@@ -8,7 +8,6 @@ class Opportunities extends Auth_Controller
   {
     parent::__construct();
     $this->load->model('opportunity_model');
-    $this->load->model('contact_model');
       /*
       if(!$this->ion_auth->in_group('admin'))
       {
@@ -19,10 +18,13 @@ class Opportunities extends Auth_Controller
 
   public function index()
   {
-    echo '...';
+    $this->data['opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('status'=>'1', 'assigned_to'=>'0'))->order_by('created_at','DESC')->get_all();
+    $this->data['my_opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('assigned_to'=>$_SESSION['user_id']))->order_by('updated_at','DESC')->get_all();
+    $this->render('dashboard/opportunities/index_view');
   }
   public function create($contact_id = 0, $autoinsert = NULL, $value = NULL)
   {
+    $contact = FALSE;
     if ($contact_id !== 0)
     {
       $contact = $this->contact_model->get($contact_id);
@@ -58,9 +60,15 @@ class Opportunities extends Auth_Controller
 
     $this->form_validation->set_rules('title','Title','trim|required');
     $this->form_validation->set_rules('description','Description','trim');
+    $this->form_validation->set_rules('source','Source','trim|is_natural_no_zero|required');
+    $this->form_validation->set_rules('status','Status','trim|is_natural_no_zero|required');
 
     if($this->form_validation->run()===FALSE)
     {
+      $this->load->model('opportunity_status_model');
+      $this->data['status'] = $this->opportunity_status_model->order_by('order','ASC')->as_dropdown('status')->get_all();
+      $this->load->model('opportunity_source_model');
+      $this->data['sources'] = $this->opportunity_source_model->order_by('source','ASC')->as_dropdown('source')->get_all();
       $this->load->model('contact_type_model');
       $this->data['contact_types'] = $this->contact_type_model->order_by('title','ASC')->as_dropdown('title')
           ->get_all();
@@ -116,7 +124,9 @@ class Opportunities extends Auth_Controller
       $new_opportunity = array(
         'contact_id' => $contact_id,
         'title' => $this->input->post('title'),
-        'description' => $this->input->post('description')
+        'description' => $this->input->post('description'),
+        'source' => $this->input->post('source'),
+        'status' => $this->input->post('status')
       );
       $opportunity_id = $this->opportunity_model->insert($new_opportunity);
       if($opportunity_id===FALSE)
@@ -166,6 +176,22 @@ class Opportunities extends Auth_Controller
     }
     $this->data['search_value'] = trim($this->input->post('search'));
     $this->render('dashboard/opportunities/index_search_view');
+  }
+
+  public function take($id)
+  {
+    $id = (int) $id;
+    $opportunity = $this->opportunity_model->with_user('fields:email')->get($id);
+    if($opportunity->assigned_to !== '0')
+    {
+      $this->postal->add('Opportunity already taken by '.$opportunity->user->email,'error');
+      redirect('dashboard/opportunities');
+    }
+    else
+    {
+      $this->opportunity_model->update(array('assigned_to'=>$_SESSION['user_id'],'status'=>'2'), array('id'=>$id));
+    }
+
   }
 
   public function delete($id = NULL)

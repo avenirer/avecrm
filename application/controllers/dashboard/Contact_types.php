@@ -32,9 +32,9 @@ class Contact_types extends Auth_Controller
     }
     else
     {
-        $this->rat->log('Added contact type with id '.$id,1,$_SESSION['user_id']);
+        $this->rat->log('Added contact type with id '.$id,1);
         $this->postal->add('Contact type added successfully','success');
-        redirect('dashboard');
+        redirect('dashboard/contact-types');
     }
   }
   public function edit($type_id = 0)
@@ -52,7 +52,7 @@ class Contact_types extends Auth_Controller
     }
     else
     {
-        $this->rat->log('Edited contact type with id '.$type_id,1,$_SESSION['user_id']);
+        $this->rat->log('Edited contact type with id '.$type_id,1);
         $this->postal->add('Contact type edited successfully','success');
         redirect('dashboard/contact-types');
     }
@@ -62,17 +62,17 @@ class Contact_types extends Auth_Controller
   {
     if(is_null($type_id))
     {
-      $this->postal->add('There\'s no contact to delete','error');
+      $this->postal->add('There\'s no contact type to delete','error');
     }
     elseif($this->customer_type_model->delete($type_id))
     {
-      $this->rat->log('Deleted contact type with id '.$type_id,0,$_SESSION['user_id']);
+      $this->rat->log('Deleted contact type with id '.$type_id,0);
       $this->postal->add('Contact type deleted successfully','success');
     }
     else
     {
       $this->postal->add('Could not delete the contact type','error');
     }
-    redirect('dashboard/contact_types');
+    redirect('dashboard/contact-types');
   }
 }
