@@ -8,6 +8,7 @@ class Opportunities extends Auth_Controller
   {
     parent::__construct();
     $this->load->model('opportunity_model');
+    $this->load->model('contact_model');
       /*
       if(!$this->ion_auth->in_group('admin'))
       {
@@ -20,8 +21,11 @@ class Opportunities extends Auth_Controller
   {
     $this->data['opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('status'=>'1', 'assigned_to'=>'0'))->order_by('created_at','DESC')->get_all();
     $this->data['my_opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('assigned_to'=>$_SESSION['user_id']))->order_by('updated_at','DESC')->get_all();
+    $this->data['unread_opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('assigned_to'=>$_SESSION['user_id'],'read'=>'0'))->order_by('updated_at','DESC')->get_all();
     $this->render('dashboard/opportunities/index_view');
   }
+
+
   public function create($contact_id = 0, $autoinsert = NULL, $value = NULL)
   {
     $contact = FALSE;
@@ -125,8 +129,10 @@ class Opportunities extends Auth_Controller
         'contact_id' => $contact_id,
         'title' => $this->input->post('title'),
         'description' => $this->input->post('description'),
+        'assigned_to' => $_SESSION['user_id'],
         'source' => $this->input->post('source'),
-        'status' => $this->input->post('status')
+        'status' => $this->input->post('status'),
+        'read' => '1'
       );
       $opportunity_id = $this->opportunity_model->insert($new_opportunity);
       if($opportunity_id===FALSE)
@@ -189,13 +195,24 @@ class Opportunities extends Auth_Controller
     }
     else
     {
-      $this->opportunity_model->update(array('assigned_to'=>$_SESSION['user_id'],'status'=>'2'), array('id'=>$id));
+      $this->opportunity_model->update(array('assigned_to'=>$_SESSION['user_id'],'status'=>'2','read'=>'1'), array('id'=>$id));
     }
+  }
 
+  public function details($id)
+  {
+    $opportunity = $this->opportunity_model->where('assigned_to',$_SESSION['user_id'])->get($id);
+    if($opportunity===FALSE)
+    {
+      redirect('opportunities');
+    }
+    print_r($opportunity);
+    echo 'in here we have details for opportunity';
   }
 
   public function delete($id = NULL)
   {
+    echo 'why would you?... Anyway... you can\'t delete an opportunity. It\'s your shame to wear.';
     /*
     if(is_null($id))
     {

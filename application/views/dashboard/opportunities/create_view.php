@@ -2,7 +2,7 @@
 <?php
 if(isset($contact))
 {
-  echo '<div class="row"><div class="col-lg-12"><a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">View contact details</a></div></div>';
+  echo '<div class="row"><div class="col-lg-12"><a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">'.$this->lang->line('add_contact_title').'</a></div></div>';
 
 }
 ?>
@@ -14,7 +14,7 @@ if(isset($contact))
   }
   ?>
   <div class="col-lg-12">
-    <h2>Contact details</h2>
+    <h2><?php echo $this->lang->line('contact_details_title');?></h2>
   </div>
   <div class="col-lg-4">
     <?php echo form_open();?>

@@ -1,8 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <div class="row">
   <div class="col-lg-12">
-    <a href="<?php echo site_url('dashboard/cities/create');?>" class="btn btn-primary">Add city</a>
-    <a href="<?php echo site_url('dashboard/cities');?>" class="btn btn-primary">See all cities</a>
+    <?php
+    echo anchor('dashboard/cities/create',$this->lang->line('link_add'),'class="btn btn-primary"').' ';
+    echo anchor('dashboard/cities',$this->lang->line('link_list'),'class="btn btn-primary"');
+    ?>
   </div>
 </div>
 <div class="row">
@@ -11,7 +13,7 @@
     if($cities)
     {
       echo '<table class="table table-hover table-bordered table-condensed">';
-      echo '<tr><td>ID</td><td>Cities</td></td><td>Operations</td></tr>';
+      echo '<tr><td>'.$this->lang->line('table_id_field').'</td><td>'.$this->lang->line('table_city_field').'</td><td>'.$this->lang->line('table_operations_field').'</td></tr>';
       foreach($cities as $city)
       {
         echo '<tr>';

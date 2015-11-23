@@ -2,52 +2,75 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
+  protected $data = array();
+  public $website;
+  public $language_file;
+  function __construct()
+  {
+    parent::__construct();
+    $this->load->model('website_model');
+    $this->website = $this->website_model->get();
+    $this->data['website'] = $this->website;
 
-    protected $data = array();
-    public $website;
-    function __construct()
+    $this->data['page_title'] = $this->website->page_title;
+    $this->data['page_description'] = '';
+    $this->data['before_closing_head'] = '';
+    $this->data['before_closing_body'] = '';
+
+    $this->load->model('banned_model');
+    $ips = $this->banned_model->set_cache('banned_ips',3600)->get_all();
+    $banned_ips = array();
+    if(!empty($ips))
     {
-        parent::__construct();
-        $this->load->model('website_model');
-        $this->website = $this->website_model->get();
-        $this->data['website'] = $this->website;
-
-        $this->data['page_title'] = $this->website->page_title;
-        $this->data['page_description'] = 'CI_App';
-        $this->data['before_closing_head'] = '';
-        $this->data['before_closing_body'] = '';
-
-        $this->load->model('banned_model');
-        $ips = $this->banned_model->set_cache('banned_ips',3600)->get_all();
-        $banned_ips = array();
-        if(!empty($ips))
-        {
-            foreach($ips as $ip)
-            {
-                $banned_ips[] = $ip->ip;
-            }
-        }
-        if(in_array($_SERVER['REMOTE_ADDR'],$banned_ips))
-        {
-            echo 'You are banned from this site.';
-            exit;
-        }
-        if($this->website->status == '0') {
-            if($this->router->class!=='user')
-            {
-                $this->load->library('ion_auth');
-                if (!$this->ion_auth->is_admin()) {
-                    redirect('offline', 'refresh', 503);
-                }
-            }
-        }
+      foreach($ips as $ip)
+      {
+        $banned_ips[] = $ip->ip;
+      }
     }
+    if(in_array($_SERVER['REMOTE_ADDR'],$banned_ips))
+    {
+      echo 'You are banned from this site.';
+      exit;
+    }
+
+    if($this->website->status == '0')
+    {
+      if($this->router->class!=='user')
+      {
+        $this->load->library('ion_auth');
+        if (!$this->ion_auth->is_admin())
+        {
+          redirect('offline', 'refresh', 503);
+        }
+      }
+    }
+  }
 
     protected function render($the_view = NULL, $template = 'public_master')
     {
-        if($template == 'json' || $this->input->is_ajax_request())
-        {
-            header('Content-Type: application/json');
+      if(!isset($this->language_file))
+      {
+        $uri = explode('/', uri_string());
+        $calling_class = strtolower(get_class($this));
+        foreach ($uri as $key => $value) {
+          if (is_numeric($value)) unset($uri[$key]);
+          else $uri[$key] = str_replace('-', '_', $value);
+        }
+
+        $current_method = debug_backtrace()[2]['function'];
+        $method_key = array_search($current_method, $uri);
+        $language_file_array = array_slice($uri, 0, ($method_key + 1));
+
+        if (!in_array($calling_class, $language_file_array)) $language_file_array[] = $calling_class;
+        if (!in_array($current_method, $language_file_array)) $language_file_array[] = $current_method;
+        $this->language_file = implode('_', $language_file_array);
+      }
+      $this->lang->load('app_files/'.strtolower($this->language_file).'_lang');
+
+
+      if($template == 'json' || $this->input->is_ajax_request())
+      {
+        header('Content-Type: application/json');
             echo json_encode($this->data);
         }
         elseif(is_null($template))
