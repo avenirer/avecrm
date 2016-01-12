@@ -51,16 +51,26 @@ class MY_Controller extends CI_Controller {
       if(!isset($this->language_file))
       {
         $uri = explode('/', uri_string());
-        $calling_class = strtolower(get_class($this));
+        $calling_class = get_class($this);
         foreach ($uri as $key => $value) {
           if (is_numeric($value)) unset($uri[$key]);
           else $uri[$key] = str_replace('-', '_', $value);
         }
 
-        $current_method = debug_backtrace()[2]['function'];
+        $methods = debug_backtrace();
+
+        foreach($methods as $method)
+        {
+          if($method['function']!=='render' && method_exists($calling_class,$method['function']))
+          {
+            $current_method = $method['function'];
+          }
+        }
+
         $method_key = array_search($current_method, $uri);
         $language_file_array = array_slice($uri, 0, ($method_key + 1));
 
+        $calling_class = strtolower($calling_class);
         if (!in_array($calling_class, $language_file_array)) $language_file_array[] = $calling_class;
         if (!in_array($current_method, $language_file_array)) $language_file_array[] = $current_method;
         $this->language_file = implode('_', $language_file_array);

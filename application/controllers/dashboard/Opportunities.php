@@ -201,13 +201,28 @@ class Opportunities extends Auth_Controller
 
   public function details($id)
   {
-    $opportunity = $this->opportunity_model->where('assigned_to',$_SESSION['user_id'])->get($id);
-    if($opportunity===FALSE)
-    {
-      redirect('opportunities');
-    }
-    print_r($opportunity);
-    echo 'in here we have details for opportunity';
+      $opportunity = $this->opportunity_model->where('assigned_to',$_SESSION['user_id'])->get($id);
+      if($opportunity===FALSE)
+      {
+          redirect('opportunities');
+      }
+
+      $this->form_validation->set_rules('title','Title','trim|required');
+      $this->form_validation->set_rules('description','Description','trim');
+      $this->form_validation->set_rules('source','Source','trim|is_natural_no_zero|required');
+      $this->form_validation->set_rules('status','Status','trim|is_natural_no_zero|required');
+      $this->form_validation->set_rules('opportunity_id','trim|is_natural_no_zero|required');
+
+
+      $this->data['opportunity'] = $opportunity;
+
+      $this->load->model('opportunity_source_model');
+      $this->data['sources'] = $this->opportunity_source_model->order_by('source','ASC')->as_dropdown('source')->get_all();
+
+      $this->load->model('opportunity_status_model');
+      $this->data['status'] = $this->opportunity_status_model->order_by('order','ASC')->as_dropdown('status')->get_all();
+
+      $this->render('dashboard/opportunities/details_view');
   }
 
   public function delete($id = NULL)
