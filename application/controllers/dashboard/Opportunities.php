@@ -207,23 +207,70 @@ class Opportunities extends Auth_Controller
           redirect('opportunities');
       }
 
-      $this->form_validation->set_rules('title','Title','trim|required');
-      $this->form_validation->set_rules('description','Description','trim');
-      $this->form_validation->set_rules('source','Source','trim|is_natural_no_zero|required');
-      $this->form_validation->set_rules('status','Status','trim|is_natural_no_zero|required');
-      $this->form_validation->set_rules('opportunity_id','trim|is_natural_no_zero|required');
-
-
       $this->data['opportunity'] = $opportunity;
 
       $this->load->model('opportunity_source_model');
       $this->data['sources'] = $this->opportunity_source_model->order_by('source','ASC')->as_dropdown('source')->get_all();
+
+      $this->data['source_links'] = $this->opportunity_source_model->order_by('source','ASC')->get_all();
 
       $this->load->model('opportunity_status_model');
       $this->data['status'] = $this->opportunity_status_model->order_by('order','ASC')->as_dropdown('status')->get_all();
 
       $this->render('dashboard/opportunities/details_view');
   }
+
+    public function edit($opportunity_id = NULL)
+    {
+        $this->form_validation->set_rules('title','Title','trim|required');
+        $this->form_validation->set_rules('description','Description','trim');
+        $this->form_validation->set_rules('source','Source','trim|is_natural_no_zero|required');
+        $this->form_validation->set_rules('status','Status','trim|is_natural_no_zero|required');
+        $this->form_validation->set_rules('opportunity_id','trim|is_natural_no_zero|required');
+
+        if($this->form_validation->run()===FALSE)
+        {
+            $opportunity_id = isset($opportunity_id) ? $opportunity_id : $this->input->post('opportunity_id');
+            $opportunity = $this->opportunity_model->where('assigned_to',$_SESSION['user_id'])->get($opportunity_id);
+
+            if($opportunity==FALSE)
+            {
+                redirect('opportunities');
+            }
+
+            $this->data['opportunity'] = $opportunity;
+
+            $this->load->model('opportunity_source_model');
+            $this->data['sources'] = $this->opportunity_source_model->order_by('source','ASC')->as_dropdown('source')->get_all();
+
+            $this->load->model('opportunity_status_model');
+            $this->data['status'] = $this->opportunity_status_model->order_by('order','ASC')->as_dropdown('status')->get_all();
+
+            $this->render('dashboard/opportunities/edit_view');
+        }
+        else
+        {
+            $updated_opportunity = array(
+                    'title' => $this->input->post('title'),
+                    'description' => $this->input->post('description'),
+                    'source' => $this->input->post('source'),
+                    'status' => $this->input->post('status'),
+                    'read' => '1'
+            );
+            $opportunity_id = $this->input->post('opportunity_id');
+            if($this->opportunity_model->update($updated_opportunity,$opportunity_id))
+            {
+                $this->rat->log('Edited opportunity with id '.$opportunity_id,1,$_SESSION['user_id']);
+                $this->postal->add('Opportunity edited successfully','success');
+            }
+            else
+            {
+                $this->rat->log('Had a problem editing opportunity '.$opportunity_id,0,$_SESSION['user_id']);
+                $this->postal->add('Couldn\'t edit opportunity','error');
+            }
+            redirect('dashboard/opportunities/details/'.$opportunity_id);
+        }
+    }
 
   public function delete($id = NULL)
   {

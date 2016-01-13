@@ -8,6 +8,7 @@ if(isset($opportunity))
 ?>
 <div class="row">
     <div class="collapse" id="collapseExample">
+        <?php echo form_open(site_url('dashboard/opportunities/edit'));?>
         <div class="col-lg-12">
             <h2><?php echo $this->lang->line('edit_opportunity_title');?></h2>
         </div>
@@ -66,7 +67,6 @@ if(isset($opportunity))
             echo form_error('opportunity_id');
             echo form_hidden('opportunity_id',$opportunity->id);
             echo form_submit('submit', 'Edit opportunity', 'class="btn btn-primary btn-lg btn-block"');
-            echo anchor('dashboard/opportunities', 'Cancel','class="btn btn-default btn-lg btn-block"');
             echo form_close();?>
         </div>
     </div>
@@ -75,9 +75,43 @@ if(isset($opportunity))
     <div class="col-lg-12">
         <h1><?php echo $this->lang->line('conversation_history_title');?></h1>
         <?php
-
-
+        if(isset($source_links))
+        {
+            echo '<ul class="nav nav-tabs" role="tablist">';
+            foreach($source_links as $source)
+            {
+                //print_r($source);
+                echo '<li role="presentation"'.(($source->source=='Email') ? 'class="active"' : '').'><a href="#tab'.$source->id.'" aria-controls="tab'.$source->id.'" role="tab" data-toggle="tab">'.$source->source.'</a></li>';
+            }
+            echo '</ul>';
+            echo '<div class="tab-content">';
+            foreach($source_links as $source)
+            {
+                echo '<div role="tabpanel" class="tab-pane'.(($source->source=='Email') ? ' active' : '').'" id="tab'.$source->id.'">';
+                switch ($source->source) {
+                    case 'Email' :
+                        ?>
+                            Email
+                        <?php
+                        break;
+                    default :
+                        ?>
+                            Phone or whatever
+                        <?php
+                        break;
+                        ?>
+                <?php
+                }
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+        ?>
+    </div>
+    <div class="col-lg-12">
+        <?php
         echo anchor('dashboard/opportunity/edit/'.$opportunity->id, 'Edit opportunity','class="btn btn-primary btn-lg btn-block"');
+        echo anchor('dashboard/opportunities', 'Cancel','class="btn btn-default btn-lg btn-block"');
         ?>
     </div>
 
