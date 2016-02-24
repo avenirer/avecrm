@@ -7,4 +7,6 @@ class Welcome extends MY_Controller {
 	{
 		$this->load->view('welcome_message');
 	}
+
+
 }

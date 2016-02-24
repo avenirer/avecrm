@@ -196,7 +196,10 @@ class Opportunities extends Auth_Controller
     }
     else
     {
-      $this->opportunity_model->update(array('assigned_to'=>$_SESSION['user_id'],'status'=>'2','read'=>'1'), array('id'=>$id));
+        $this->load->helper('string');
+        $opportunity_url = random_string('alnum',20);
+        $opportunity_pass = random_string('alnum',8);
+      $this->opportunity_model->update(array('assigned_to'=>$_SESSION['user_id'],'status'=>'2','read'=>'1','url'=>$opportunity_url,'password'=>$opportunity_pass), array('id'=>$id));
     }
   }
 
