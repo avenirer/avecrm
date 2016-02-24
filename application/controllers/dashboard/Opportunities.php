@@ -8,6 +8,7 @@ class Opportunities extends Auth_Controller
   {
     parent::__construct();
     $this->load->model('opportunity_model');
+      $this->load->model('conversation_model');
     $this->load->model('contact_model');
       /*
       if(!$this->ion_auth->in_group('admin'))
@@ -19,7 +20,7 @@ class Opportunities extends Auth_Controller
 
   public function index()
   {
-    $this->data['opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('status'=>'1', 'assigned_to'=>'0'))->order_by('created_at','DESC')->get_all();
+    $this->data['opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->with_contact('fields:first_name,last_name,email,phone,contact_type')->where(array('status'=>'1', 'assigned_to'=>'0'))->order_by('created_at','DESC')->get_all();
     $this->data['my_opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('assigned_to'=>$_SESSION['user_id']))->order_by('updated_at','DESC')->get_all();
     $this->data['unread_opportunities'] = $this->opportunity_model->with_status('fields:status')->with_source('fields:source')->where(array('assigned_to'=>$_SESSION['user_id'],'read'=>'0'))->order_by('updated_at','DESC')->get_all();
     $this->render('dashboard/opportunities/index_view');
@@ -202,12 +203,28 @@ class Opportunities extends Auth_Controller
   public function details($id)
   {
       $opportunity = $this->opportunity_model->where('assigned_to',$_SESSION['user_id'])->get($id);
+      // if there is no opportunity, redirect
       if($opportunity===FALSE)
       {
           redirect('opportunities');
       }
-
       $this->data['opportunity'] = $opportunity;
+
+      //get the contact of this opportunity
+      $contact = $this->contact_model->with_city('fields:name')->with_type('fields:title')->get($opportunity->contact_id);
+      //if there is no contact, then... oups
+      if($contact===FALSE)
+      {
+          $this->rat->log('There is an opportunity without a contact attached: id '.$opportunity->id);
+          $this->postal->add('The opportunity has no contact attached to it... which is weird. Contact administrator','error');
+      }
+      $this->data['contact'] = $contact;
+
+      // let's get the conversations regarding this opportunity
+      $conversations = $this->conversation_model->where('opportunity_id',$opportunity->id)->order_by('created_at','DESC')->get_all();
+      $this->data['conversations'] = $conversations;
+
+
 
       $this->load->model('opportunity_source_model');
       $this->data['sources'] = $this->opportunity_source_model->order_by('source','ASC')->as_dropdown('source')->get_all();
