@@ -91,7 +91,7 @@ if(isset($opportunity))
                     foreach($source_links as $source) {
                         echo '<div role="tabpanel" class="tab-pane' . (($source->source == 'Email') ? ' active' : '') . '" id="tab' . $source->id . '">';
                         echo '<h2>'.$source->source.'</h2>';
-                        echo form_open();
+                        echo form_open('dashboard/conversations/add/');
                         echo '<div class="form-group">';
                         echo form_error('body');
                         echo form_textarea('body',set_value('body'),'class="form-control" placeholder="Message"');
@@ -99,7 +99,7 @@ if(isset($opportunity))
                         echo form_hidden('source_id',$source->id);
                         echo form_hidden('opportunity_id',$opportunity->id);
                         echo '<div class="form-group">';
-                        echo form_submit('dashboard/conversations/add/', 'Save/Send '.$source->source,'class="btn btn-primary btn-lg btn-block"');
+                        echo form_submit('submit','Save/Send '.$source->source,'class="btn btn-primary btn-lg btn-block"');
                         echo '</div>';
                         echo form_close();
                         echo '</div>';

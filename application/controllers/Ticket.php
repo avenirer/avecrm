@@ -11,21 +11,27 @@ class Ticket extends MY_Controller {
 
     public function _remap($url, $params = array())
     {
-        if (!method_exists($this, $url) && strlen($url)==20)
+        $method = str_replace('-','_',$url);
+        if (!method_exists($this, $method) && strlen($url)==20)
         {
             $this->index($url);
         }
-        elseif(method_exists($this,$url))
+        elseif(method_exists($this,$method))
         {
-            return call_user_func_array(array($this, 'index'), $params);
+            return call_user_func_array(array($this, $method), $params);
         }
         else
         {
-            redirect();
+            echo '...';
+            //redirect();
         }
     }
 	public function index($url)
 	{
+        if(isset($_SESSION['url']) || isset($_SESSION['password']))
+        {
+            redirect('ticket/history');
+        }
         if($this->form_validation->alpha_numeric($url) && strlen($url)==20)
         {
             $this->form_validation->set_rules('password', 'Password', 'trim|alpha_numeric|exact_length[8]|required');
@@ -35,21 +41,17 @@ class Ticket extends MY_Controller {
                 $opportunity_url = $this->input->post('url');
                 $password = $this->input->post('password');
                 $this->load->model('opportunity_model');
-                $opportunity = $this->opportunity_model->where(array('url'=>$opportunity_url, 'password'=>$password))->with_contact('fields:first_name,last_name')->with_user('fields:first_name,last_name')->get();
+                $opportunity = $this->opportunity_model->where(array('url'=>$opportunity_url, 'password'=>$password))->get();
                 if($opportunity===FALSE)
                 {
                     $this->render('public/ticket/error_view');
                 }
                 else
                 {
-                    $this->load->model('conversation_model');
-                    $conversation = $this->conversation_model->where('opportunity_id',$opportunity->id)->get_all();
+                    $_SESSION['url'] = $url;
+                    $_SESSION['password'] = $password;
+                    redirect('ticket/history');
                 }
-
-                print_r($opportunity);
-                echo '<br /><br />';
-                print_r($conversation);
-                $this->render('public/ticket/index_view');
 
             }
             else
@@ -63,6 +65,39 @@ class Ticket extends MY_Controller {
             redirect();
         }
 	}
+
+    public function history()
+    {
+
+        $return = '0' == 0;
+        var_dump($return);
+        exit;
+        if(!isset($_SESSION['url']) || !isset($_SESSION['password']))
+        {
+            redirect('ticket/index/'.$_SESSION['url']);
+        }
+        $url = $_SESSION['url'];
+        $password = $_SESSION['password'];
+
+        $this->load->model('opportunity_model');
+        $opportunity = $this->opportunity_model->where(array('url'=>$url, 'password'=>$password))->with_contact('fields:first_name,last_name')->with_user('fields:first_name,last_name')->get();
+        if($opportunity===FALSE)
+        {
+            $this->render('public/ticket/error_view');
+        }
+
+        $this->data['opportunity'] = $opportunity;
+
+        $this->load->model('conversation_model');
+        $conversation = $this->conversation_model->where('opportunity_id',$opportunity->id)->get_all();
+
+        $this->data['conversation'] = $conversation;
+
+//        print_r($opportunity);
+//        echo '<br /><br />';
+//        print_r($conversation);
+        $this->render('public/ticket/index_view');
+    }
 
 
 }

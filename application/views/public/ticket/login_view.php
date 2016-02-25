@@ -1,9 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <div class="container">
     <div class="row">
-        <?php
-        echo isset($_SESSION['auth_message']) ? $_SESSION['auth_message'] : FALSE;
-        ?>
         <h1>Ticket view</h1>
         <p>You reached this page because are trying to view a ticket that is protected by a password. In order to access the ticket conversation history and files, we need you to insert the password you received with this particular ticket.</p>
         <div class="col-lg-4 col-lg-offset-4">
